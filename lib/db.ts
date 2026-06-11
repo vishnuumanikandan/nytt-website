@@ -9,6 +9,7 @@ if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
 const db = new Database(path.join(dataDir, "nytt.db"));
 db.pragma("journal_mode = WAL");
 db.pragma("foreign_keys = ON");
+db.pragma("busy_timeout = 5000");
 
 db.exec(`
 CREATE TABLE IF NOT EXISTS chapters (
@@ -169,14 +170,20 @@ function seed() {
   if (adminCount.n === 0) {
     const username = process.env.ADMIN_USERNAME || "admin";
     const password = process.env.ADMIN_PASSWORD || "nytt-admin";
-    db.prepare("INSERT INTO admins (username, password_hash) VALUES (?, ?)").run(
-      username,
-      bcrypt.hashSync(password, 10),
-    );
+    // OR IGNORE: concurrent processes may race this block; one wins, the
+    // rest no-op instead of throwing SQLITE_CONSTRAINT_UNIQUE.
+    db.prepare(
+      "INSERT OR IGNORE INTO admins (username, password_hash) VALUES (?, ?)",
+    ).run(username, bcrypt.hashSync(password, 10));
   }
 }
 
-seed();
+// `next build` imports this module from parallel workers while collecting
+// page data; the build container's database is throwaway anyway. Seed only
+// at runtime, where the persistent volume is mounted.
+if (process.env.NEXT_PHASE !== "phase-production-build") {
+  seed();
+}
 
 /* ---------- Chapters ---------- */
 
