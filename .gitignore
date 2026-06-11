@@ -20,6 +20,12 @@
 # production
 /build
 
+# database: contains chapter contact info and password hashes, never commit
+/data
+*.db
+*.db-shm
+*.db-wal
+
 # misc
 .DS_Store
 *.pem

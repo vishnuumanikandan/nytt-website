@@ -1,26 +1,402 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ------------------------------------------------------------------
+   Civic print, two editions.
+   Light: ink on archival paper. Dark: gold leaf on midnight navy.
+   Every token is semantic; components never hardcode a hex.
+   ------------------------------------------------------------------ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Surfaces */
+  --bg: oklch(98.5% 0.004 270); /* page: archival paper */
+  --bg-shade: oklch(95.5% 0.007 270); /* tinted band */
+  --surface: oklch(100% 0 0); /* cards, forms */
+  --band: oklch(32% 0.1 268); /* brand navy band */
+  --band-deep: oklch(25% 0.08 270);
+
+  /* Text */
+  --tx: oklch(24% 0.06 272); /* ink */
+  --tx-muted: oklch(45% 0.04 272);
+  --tx-brand: oklch(32% 0.1 268); /* navy headings -> gilded in dark */
+  --tx-ghost: oklch(24% 0.06 272 / 14%); /* oversized ghost numerals */
+
+  /* On-navy (constant-ish across themes) */
+  --on-navy: oklch(97% 0.005 85);
+  --on-navy-faint: oklch(100% 0 0 / 72%);
+
+  /* Interactive */
+  --accent: oklch(46% 0.17 266); /* links, focus: royal ink */
+  --accent-hover: oklch(40% 0.15 267);
+  --btn: oklch(46% 0.17 266); /* primary button fill */
+  --btn-fg: oklch(98.5% 0.004 270);
+  --btn-hover: oklch(40% 0.15 267);
+
+  /* Brand constants */
+  --gold: oklch(80% 0.13 88);
+  --gold-strong: oklch(62% 0.12 80); /* gold as text on light paper */
+  --gold-fg: oklch(22% 0.05 270); /* text on gold fills */
+
+  /* Lines */
+  --line: oklch(88% 0.01 270);
+  --line-navy: oklch(100% 0 0 / 16%);
+  --frame: oklch(80% 0.13 88 / 55%); /* bezel frames */
+
+  /* Semantic states */
+  --ok: oklch(45% 0.12 155);
+  --ok-soft: oklch(95% 0.03 155);
+  --bad: oklch(46% 0.19 25);
+  --bad-soft: oklch(95.5% 0.02 25);
+  --warn: oklch(47% 0.13 70);
+  --warn-soft: oklch(96% 0.04 90);
+
+  --shadow-tint: oklch(32% 0.1 268 / 10%);
+  --grain-opacity: 0.05;
+
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --bg: oklch(17.5% 0.028 272); /* midnight archive */
+  --bg-shade: oklch(20.5% 0.032 272);
+  --surface: oklch(22.5% 0.035 272);
+  --band: oklch(24% 0.06 268); /* navy band still reads as a band */
+  --band-deep: oklch(15% 0.03 270);
+
+  --tx: oklch(93% 0.008 270);
+  --tx-muted: oklch(73% 0.022 270);
+  --tx-brand: oklch(88% 0.045 88); /* gilded headings */
+  --tx-ghost: oklch(93% 0.008 270 / 10%);
+
+  --on-navy: oklch(96% 0.006 85);
+  --on-navy-faint: oklch(100% 0 0 / 70%);
+
+  --accent: oklch(82% 0.125 90); /* gold leaf does the linking */
+  --accent-hover: oklch(88% 0.1 92);
+  --btn: oklch(80% 0.13 88); /* primary = gold plate */
+  --btn-fg: oklch(20% 0.05 270);
+  --btn-hover: oklch(87% 0.1 90);
+
+  --gold: oklch(80% 0.13 88);
+  --gold-strong: oklch(80% 0.12 86);
+  --gold-fg: oklch(20% 0.05 270);
+
+  --line: oklch(100% 0 0 / 13%);
+  --line-navy: oklch(100% 0 0 / 15%);
+  --frame: oklch(80% 0.13 88 / 45%);
+
+  --ok: oklch(78% 0.12 155);
+  --ok-soft: oklch(35% 0.06 155 / 35%);
+  --bad: oklch(76% 0.13 25);
+  --bad-soft: oklch(38% 0.09 25 / 30%);
+  --warn: oklch(80% 0.12 85);
+  --warn-soft: oklch(40% 0.07 80 / 35%);
+
+  --shadow-tint: oklch(5% 0.02 270 / 50%);
+  --grain-opacity: 0.07;
+
+  color-scheme: dark;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-paper: var(--bg);
+  --color-paper-shade: var(--bg-shade);
+  --color-surface: var(--surface);
+  --color-navy: var(--band);
+  --color-navy-deep: var(--band-deep);
+
+  --color-ink: var(--tx);
+  --color-ink-muted: var(--tx-muted);
+  --color-brand: var(--tx-brand);
+  --color-ghost: var(--tx-ghost);
+  --color-on-navy: var(--on-navy);
+  --color-on-navy-faint: var(--on-navy-faint);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-btn: var(--btn);
+  --color-btn-fg: var(--btn-fg);
+  --color-btn-hover: var(--btn-hover);
+
+  --color-gold: var(--gold);
+  --color-gold-strong: var(--gold-strong);
+  --color-gold-fg: var(--gold-fg);
+
+  --color-line: var(--line);
+  --color-line-navy: var(--line-navy);
+  --color-frame: var(--frame);
+
+  --color-success: var(--ok);
+  --color-success-soft: var(--ok-soft);
+  --color-error: var(--bad);
+  --color-error-soft: var(--bad-soft);
+  --color-warning: var(--warn);
+  --color-warning-soft: var(--warn-soft);
+
+  --font-display: var(--font-besley), Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-public-sans), system-ui, -apple-system, sans-serif;
+
+  --radius-ctl: 2px;
+  --radius-portrait: 4px;
+
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-press: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--tx);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  transition: background-color 0.35s var(--ease-out-quint);
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+::selection {
+  background: var(--gold);
+  color: var(--gold-fg);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.band-navy :focus-visible {
+  outline-color: var(--gold);
+}
+
+/* ------------------------------------------------------------------
+   Film grain: a fixed, non-interactive print texture over everything.
+   ------------------------------------------------------------------ */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: var(--grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+  mix-blend-mode: overlay;
+}
+
+/* ------------------------------------------------------------------
+   Double bezel: photographs sit in a machined frame, never flat.
+   ------------------------------------------------------------------ */
+.bezel {
+  position: relative;
+  padding: 0.5rem;
+  border: 1px solid var(--frame);
+  background: oklch(from var(--gold) l c h / 4%);
+}
+
+.bezel::after {
+  content: "";
+  position: absolute;
+  inset: 0.5rem;
+  pointer-events: none;
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 12%);
+}
+
+.bezel > * {
+  display: block;
+}
+
+/* Crosshair registration marks: only on compartments holding real content */
+.reg-mark {
+  position: relative;
+}
+
+.reg-mark::before {
+  content: "+";
+  position: absolute;
+  top: -0.7rem;
+  left: -0.32rem;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  line-height: 1;
+  color: var(--gold-strong);
+  opacity: 0.7;
+}
+
+/* ------------------------------------------------------------------
+   Hero entrance: CSS-driven so content is server-rendered visible and
+   animates without waiting for hydration.
+   ------------------------------------------------------------------ */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-rise {
+    animation: rise-in 0.9s var(--ease-out-quint) both;
+  }
+  .hero-rise-2 {
+    animation-delay: 0.12s;
+  }
+  .hero-rise-3 {
+    animation-delay: 0.24s;
+  }
+  .hero-rise-4 {
+    animation-delay: 0.36s;
+  }
+}
+
+/* Scroll reveal states (applied only after hydration, below the fold) */
+.reveal-hidden {
+  opacity: 0;
+  transform: translateY(28px);
+  filter: blur(5px);
+}
+
+.reveal-shown {
+  opacity: 1;
+  transform: none;
+  filter: blur(0);
+  transition:
+    opacity 0.8s var(--ease-out-quint),
+    transform 0.8s var(--ease-out-quint),
+    filter 0.8s var(--ease-out-quint);
+}
+
+/* Chapter-name marquee: one per page, paused for reduced motion */
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-track {
+  animation: marquee-scroll 60s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
+}
+
+/* Animated underline for nav links */
+.nav-link {
+  position: relative;
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 100%;
+  bottom: -6px;
+  height: 2px;
+  background: var(--accent);
+  transition: right 0.35s var(--ease-out-quint);
+}
+
+.nav-link:hover::after,
+.nav-link[aria-current="page"]::after {
+  right: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-link::after {
+    transition: none;
+  }
+}
+
+/* Staggered mobile menu reveal */
+@media (prefers-reduced-motion: no-preference) {
+  .menu-item {
+    animation: rise-in 0.5s var(--ease-out-quint) both;
+    animation-delay: calc(var(--i) * 55ms);
+  }
+}
+
+/* Ghost display type behind heroes (decor tied to real brand facts) */
+.ghost-type {
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 0.8;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--line-navy);
+}
+
+/* Image treatments */
+.duotone {
+  filter: saturate(0.55) contrast(1.06);
+}
+
+.duotone-wash {
+  position: relative;
+}
+
+.duotone-wash::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    160deg,
+    oklch(from var(--band) l c h / 45%),
+    oklch(from var(--band-deep) l c h / 65%)
+  );
+  mix-blend-mode: multiply;
+}
+
+/* Soft tinted elevation for raised surfaces (used sparingly) */
+.lift {
+  box-shadow:
+    0 1px 2px var(--shadow-tint),
+    0 12px 40px -18px var(--shadow-tint);
+}
+
+/* Theme transition: keep it calm, fade surfaces only */
+.theme-fade,
+.theme-fade * {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-duration: 0.35s;
+  transition-timing-function: var(--ease-out-quint);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-fade,
+  .theme-fade * {
+    transition: none;
+  }
 }
